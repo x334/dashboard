@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>ECharts</title>
+</head>
+<body>
+<div id="main" style="width: 600px;height:400px;"></div>
+
+<script src="http://echarts.baidu.com/build/dist/echarts.js"></script>
+<script src="jquery-3.2.1.min.js"></script>
+<script type="text/javascript">
+
+
+
+
+
+
+
+
+        require.config({
+            paths: {
+                echarts: 'http://echarts.baidu.com/build/dist'
+            }
+        });
+
+
+        require(
+            [
+                'echarts',
+                'echarts/chart/line',   // 按需加载所需图表，如需动态类型切换功能，别忘了同时加载相应图表
+                'echarts/chart/gauge'
+            ],
+
+			
+            function (ec) {
+                var myChart = ec.init(document.getElementById('main'));
+				//获取ajax数据
+				var zhishu = 0;
+				//强制数据同步，强制数据同步，才能将获取到ajax得到的结果变为全局变量
+				$.ajaxSettings.async=false;
+				$.get("dashboard.json",function(ajaxdata,status){
+				    //console.log("Data======: " + ajaxdata+"stats: " + status);
+					//alert("Data: " + ajaxdata + "\nStatus: " + status);
+					//将字符串数组，转化为JSON对象
+					//ajaxdata1 = JSON.stringify(ajaxdata);
+					//console.log("stringify---------: " + ajaxdata1);
+					//获取数据，并转化
+					//var getdata = $.parseJSON(ajaxdata1);
+					//console.log("parseJSON-------: " + getdata);
+					//重新定义数据，否则后面的数据读取时，会出现问题，会提示找不到变量
+					//var getdata = ajaxdata1;
+					//console.log("Data||||||||||: " + ajaxdata[0][1]);
+					//逗号分隔获取的数据，取后面的小数
+					//zhishu = getdata[0].split(',')[1];
+					zhishu = ajaxdata[0][1];
+					//console.log("Data#########: " + getdata[0]);
+					//console.log("Data: " + zhishu);
+				});
+
+
+
+
+                var option = {
+
+                    tooltip : {
+                        formatter: "{a} <br/>{b} : {c}%"
+                    },
+
+
+                    toolbox: {
+                        show : false,
+                        feature : {
+                            mark : {show: true},
+                            restore : {show: true},
+                            saveAsImage : {show: true}
+                        }
+                    },
+
+
+                    radius:[0,'100%'],
+
+
+                    series : [
+                        {
+                            name:'业务指标',
+                            type:'gauge',
+                            max:100,
+                               startAngle:180,
+                               endAngle:0,
+                            detail : {formatter:'{value}'},
+                             axisLabel: {           // 坐标轴文本标签，详见axis.axisLabel
+                                textStyle: {       // 其余属性默认使用全局文本样式，详见TEXTSTYLE
+                                    // color: '#333'
+                                }
+                            },
+                            data:[{value: 10, name: '恐慌指数'}],
+                               axisLine:{
+                                   show: true,
+                                   lineStyle: {
+                                        color: [
+                                          [0.25, '#228b22'],
+                                          [0.75, '#48b'],
+                                          [1, '#ff4500']
+                                        ],
+                                        width: 10
+                                    }
+                                }                          
+                        }
+                    ]
+                };
+                //option.series[0].data[0].value = (Math.random() * 100).toFixed(2) - 0;
+				//最终显示的恐慌指数，这是从ajax里获取的结果
+				option.series[0].data[0].value = zhishu;
+                myChart.setOption(option);
+            }
+        );
+</script>
+
+</body>
+</html>
